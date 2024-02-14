@@ -1,6 +1,6 @@
 package com.example.itrum.domain.wallet;
 
-public enum TypeWallet {
+public enum OperationType {
     DEPOSIT,
     WITHDRAW
 }

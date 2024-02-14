@@ -18,6 +18,6 @@ public class Wallet implements Serializable {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID walletId;
     @Enumerated(value = EnumType.STRING)
-    private TypeWallet typeWallet;
-    private BigDecimal amount;
+    private OperationType operationType;
+    private BigDecimal amount;// on Double
 }
