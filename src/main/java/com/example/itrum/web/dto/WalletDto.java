@@ -1,6 +1,6 @@
 package com.example.itrum.web.dto;
 
-import com.example.itrum.domain.wallet.TypeWallet;
+import com.example.itrum.domain.wallet.OperationType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -19,7 +19,7 @@ public class WalletDto {
 
     @NotNull(message = "Must select the type of operation.")
     @Schema(description = "Operation type", example = "DEPOSIT")
-    private TypeWallet typeWallet;
+    private OperationType operationType;
 
     @NotNull(message = "Need to select the magnitude of the change.")
     @Schema(description = "Amount operation", example = "1000")

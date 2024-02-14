@@ -1,23 +1,19 @@
 package com.example.itrum.service.impl;
 
-import com.example.itrum.domain.exception.IllegalTypeOperation;
 import com.example.itrum.domain.exception.ImpossibleOperationException;
-import com.example.itrum.domain.exception.InternalFailureException;
-import com.example.itrum.domain.wallet.TypeWallet;
+import com.example.itrum.domain.exception.WalletNotFoundException;
+import com.example.itrum.domain.wallet.OperationType;
 import com.example.itrum.domain.wallet.Wallet;
 import com.example.itrum.repository.WalletRepository;
 import com.example.itrum.service.WalletService;
+import com.example.itrum.web.dto.WalletDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.List;
 import java.util.UUID;
 
-import static com.example.itrum.domain.wallet.TypeWallet.DEPOSIT;
-import static com.example.itrum.domain.wallet.TypeWallet.WITHDRAW;
 
 @Service
 @RequiredArgsConstructor
@@ -27,30 +23,17 @@ public class WalletServiceImpl implements WalletService {
 
     @Override
     @Transactional
-    public Wallet operationWallet(Wallet wallet) {
-        Wallet changeableWallet = walletRepository.findWalletByWalletId(wallet.getWalletId());
-        TypeWallet typeWallet = wallet.getTypeWallet();
-        if (isValidOperation(typeWallet)) {
-            if (typeWallet == DEPOSIT) {
-                changeableWallet.setAmount(depositWallet(changeableWallet, wallet));
-                walletRepository.save(changeableWallet);
-                return changeableWallet;
-            } else if (isCorrectedOperationWithdraw(changeableWallet.getAmount(), wallet.getAmount())) {
-                changeableWallet.setAmount(withdrawWallet(changeableWallet, wallet));
-                return walletRepository.save(changeableWallet);
-            }
+    public void executeOperation(WalletDto walletDto) {
+        Wallet currentWallet = walletRepository.findWalletByWalletId(walletDto.getWalletId());
+        operate(walletDto.getOperationType(), currentWallet, walletDto.getAmount());
+        walletRepository.save(currentWallet);
+    }
+
+    private void operate(OperationType operationType, Wallet currentWallet, BigDecimal amount) {
+        switch (operationType) {
+            case DEPOSIT -> currentWallet.setAmount(currentWallet.getAmount().add(amount));
+            case WITHDRAW -> currentWallet.setAmount(currentWallet.getAmount().subtract(amount));
         }
-        throw new InternalFailureException("Что-то пошло не так, попробуйте снова.");
-    }
-
-    @Override
-    public BigDecimal depositWallet(Wallet balance, Wallet amount) {
-        return balance.getAmount().add(amount.getAmount());
-    }
-
-    @Override
-    public BigDecimal withdrawWallet(Wallet balance, Wallet amount) {
-        return balance.getAmount().subtract(amount.getAmount());
     }
 
     @Override
@@ -59,22 +42,17 @@ public class WalletServiceImpl implements WalletService {
         return walletRepository.findWalletByWalletId(walletId).getAmount();
     }
 
-    private boolean isValidOperation(TypeWallet typeWallet) {
-        if (typeWallet.equals(WITHDRAW) || typeWallet.equals(DEPOSIT)){
-            return true;
+    public void checkOperationPossible(WalletDto walletDto) {
+        Wallet wallet = walletRepository.findWalletByWalletId(walletDto.getWalletId());
+        if (wallet == null) {
+            throw new WalletNotFoundException("Кошелек не найден.");
         }
-            throw new IllegalTypeOperation("Укажите корректный тип операции (DEPOSIT/WITHDRAW).");
+        checkWithdrawOperationPossible(wallet.getAmount(), walletDto.getAmount());
     }
 
-    private boolean isCorrectedOperationWithdraw(BigDecimal balance, BigDecimal amount) {
-        if (balance.compareTo(amount) >= 0) {
-            return true;
-        } else {
+    private void checkWithdrawOperationPossible(BigDecimal balance, BigDecimal amount) {
+        if (balance.compareTo(amount) < 0) {
             throw new ImpossibleOperationException("Кажется на Вашем счете недостаточно средств для списания.");
         }
-    }
-
-    public TypeWallet getType(UUID walletId) {
-        return walletRepository.findWalletByWalletId(walletId).getTypeWallet();
     }
 }
