@@ -1,6 +1,7 @@
 package com.example.itrum.domain.wallet;
 
 import jakarta.persistence.*;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,8 +10,7 @@ import java.math.BigDecimal;
 import java.util.UUID;
 
 @Entity
-@Getter
-@Setter
+@Data
 @Table(name = "wallets")
 public class Wallet implements Serializable {
 
@@ -19,5 +19,5 @@ public class Wallet implements Serializable {
     private UUID walletId;
     @Enumerated(value = EnumType.STRING)
     private OperationType operationType;
-    private BigDecimal amount;// on Double
+    private BigDecimal amount;
 }

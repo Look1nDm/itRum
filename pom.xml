@@ -21,6 +21,8 @@
         <preliquibase.version>1.4.0</preliquibase.version>
         <hibernate-validator.version>8.0.0.Final</hibernate-validator.version>
         <jakarta.validation-api.version>3.0.2</jakarta.validation-api.version>
+        <mockito.version>5.4.0</mockito.version>
+        <mockito-junit.verson>5.4.0</mockito-junit.verson>
     </properties>
 
     <dependencies>
@@ -45,7 +47,6 @@
             <artifactId>postgresql</artifactId>
             <scope>runtime</scope>
         </dependency>
-
 
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -95,9 +96,24 @@
             <version>${springdoc.version}</version>
         </dependency>
 
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-junit-jupiter</artifactId>
+            <version>${mockito-junit.verson}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>${mockito.version}</version>
             <scope>test</scope>
         </dependency>
 
