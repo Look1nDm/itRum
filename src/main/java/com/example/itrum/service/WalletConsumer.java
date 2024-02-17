@@ -1,9 +1,8 @@
 package com.example.itrum.service;
 
+import com.example.itrum.domain.exception.InternalFailureException;
 import com.example.itrum.web.dto.WalletDto;
-import org.springframework.stereotype.Component;
 
-@Component
 public class WalletConsumer implements Runnable{
     private final QueueManager queueManager;
     private final WalletService walletService;
@@ -13,7 +12,6 @@ public class WalletConsumer implements Runnable{
         this.queueManager = queueManager;
         this.walletService = walletService;
         running = true;
-//        consume();
     }
 
     @Override
@@ -26,7 +24,7 @@ public class WalletConsumer implements Runnable{
                     queueManager.remove(wallet);
                 }
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                throw new InternalFailureException("Проблема на стороне сервера");
             }
         }
     }
